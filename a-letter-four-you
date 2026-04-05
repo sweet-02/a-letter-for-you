@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Surat Untuk Veena</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-blue: #d6f0ff;
+            --petal-pink: #ffb7c5;
+            --glass-white: rgba(255, 255, 255, 0.75); 
+            --text-dark: #4a4a4a;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            width: 100vw; height: 100dvh; 
+            overflow: hidden; 
+            font-family: 'Quicksand', sans-serif;
+            background-color: var(--bg-blue);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M50 80 C 50 80 20 60 20 40 A 15 15 0 0 1 50 40 A 15 15 0 0 1 80 40 C 80 60 50 80 50 80 Z' fill='%23ffffff' fill-opacity='0.25'/%3E%3C/svg%3E");
+            background-size: 80px 80px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- PASSKEY PAGE --- */
+        #passkey-page {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-blue);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .pass-title {
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .dots-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .dot {
+            width: 12px; height: 12px;
+            border: 1.5px solid var(--text-dark);
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .dot.active { background: var(--text-dark); }
+
+        /* iPhone-style shake animation for wrong code */
+        .shake { animation: shake 0.4s ease-in-out; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .key {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.6rem;
+            color: var(--text-dark);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            -webkit-tap-highlight-color: transparent;
+            transition: background 0.2s;
+        }
+
+        .key:active { background: rgba(255, 255, 255, 0.9); }
+
+        .hint-text {
+            margin-top: 30px;
+            font-size: 0.85rem;
+            color: #7a8a9a;
+            font-style: italic;
+        }
+
+        /* --- LETTER PAGE --- */
+        #letter-page {
+            display: none;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+
+        .card {
+            background: var(--glass-white);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); 
+            width: 85%; max-width: 340px;
+            height: 75dvh; 
+            padding: 35px 20px;
+            border-radius: 20px; 
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .letter-header { font-family: 'Dancing Script', cursive; font-size: 1.8rem; color: var(--text-dark); margin-bottom: 15px; }
+
+        .letter-body {
+            font-weight: 400; line-height: 1.7; font-size: 1rem; color: var(--text-dark);
+            overflow-y: auto; scrollbar-width: none;
+        }
+        .letter-body::-webkit-scrollbar { display: none; }
+        .letter-text { white-space: pre-wrap; margin: 0; padding-bottom: 20px; }
+
+        .last-word {
+            display: block; margin-top: 25px; font-weight: 600; font-style: italic;
+            border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 15px;
+        }
+
+        .sakura-container { position: fixed; inset: 0; pointer-events: none; }
+        .petal { position: absolute; background-color: var(--petal-pink); border-radius: 150% 0 150% 0; animation: fall linear infinite; }
+        @keyframes fall {
+            0% { transform: translateY(-10vh) translateX(0) rotate(0deg); opacity: 0.9; }
+            100% { transform: translateY(110dvh) translateX(20vw) rotate(360deg); opacity: 0.2; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="passkey-page">
+        <div class="pass-title">Enter Passcode</div>
+        <div class="dots-container" id="dots-box">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <div class="keypad">
+            <div class="key" onclick="press(1)">1</div><div class="key" onclick="press(2)">2</div><div class="key" onclick="press(3)">3</div>
+            <div class="key" onclick="press(4)">4</div><div class="key" onclick="press(5)">5</div><div class="key" onclick="press(6)">6</div>
+            <div class="key" onclick="press(7)">7</div><div class="key" onclick="press(8)">8</div><div class="key" onclick="press(9)">9</div>
+            <div></div><div class="key" onclick="press(0)">0</div><div class="key" style="font-size: 0.8rem; font-weight: bold;" onclick="backspace()">DEL</div>
+        </div>
+        <div class="hint-text">Hint: Birthday hafiy</div>
+    </div>
+
+    <div id="letter-page">
+        <div class="sakura-container" id="sakura"></div>
+        <div class="card">
+            <div class="letter-header">Veena,</div>
+            <div class="letter-body">
+                <p class="letter-text">Macam lama sudah sy nda tulis kau surat macam ni vee. Harap kau baca sampai habis laa. Sy sebenarnya takut mau cakap depan depan, jadi sy plan mau tulis jaa. I’ll keep this as simple as I can.
+
+Sebenarnya, lama sudah sy simpan perasaan ni. Dari sebelum kita betul betul kenal, sampai sekarang. Sy pernah nampak kau beberapa kali dulu sebelum karkomkal, and entah macam mana dari situ sy suka kau. Bila kita mula rapat, perasaan tu masih ada tapi sy diam sebab sy takut rosakkan apa yang kita ada.
+
+Bukan sebab sy nda serious, tapi sebab sy terlalu hargai kau dalam hidup sy. Sy takut nanti kalau sy cakap, nanti semuanya jadi lain. 
+
+Sy pernah juga cuba mau confess dulu, tapi somehow nda menjadi. Kali sebab masa tu kita ada sikit salah faham, dan dari situ sy jadi lagi takut. Jadi sy simpan saja semua ni sendiri.
+
+Sepanjang masa tu, sy diam diam doa yang baik baik untuk kau. Walaupun kita ada naik turun, sy tetap hargai setiap moment kita. Kau mungkin nda sedar, but you really mean something to me.
+
+
+Sampai satu tahap, sy sedar sy nda dapat simpan benda ni selamanya. Bukan sebab sy mengharap sesuatu, tapi sebab sy mau jujur dengan diri sendiri…and dengan kau.
+
+Jadi hari ni, sy cuma mau cakap sy suka kau, vee. Ikhlas dari hati.
+
+Tapi dalam masa yang sama, sy faham kalau perasaan kau nda sama. Sy nda harap apa apa balasan, and I don’t want you to feel pressured or guilty about this.
+
+Apa pun response kau, sy masih hargai kau. Kalau kita stay as friends pun, sy masih okay. Sebab for me, having you in my life is already something I’m thankful for. Even as a friend.
+
+Thank you sebab sudi baca isi hati yang kecil ni🤍
+
+– Fiyy
+
+<span class="last-word">*Tapi kalau ada peluang, let me love you right, if your past failed to appreciate you🤍</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- PASSKEY LOGIC ---
+        const CORRECT_CODE = "021024"; 
+        let inputCode = "";
+        const dots = document.querySelectorAll('.dot');
+        const dotsBox = document.getElementById('dots-box');
+
+        function press(num) {
+            if (inputCode.length < 6) {
+                inputCode += num;
+                updateDots();
+                if (inputCode.length === 6) {
+                    setTimeout(checkCode, 200);
+                }
+            }
+        }
+
+        function backspace() {
+            inputCode = inputCode.slice(0, -1);
+            updateDots();
+        }
+
+        function updateDots() {
+            dots.forEach((dot, i) => {
+                if (i < inputCode.length) dot.classList.add('active');
+                else dot.classList.remove('active');
+            });
+        }
+
+        function checkCode() {
+            if (inputCode === CORRECT_CODE) {
+                // Correct Code
+                document.getElementById('passkey-page').style.transform = "translateY(-100%)";
+                document.getElementById('letter-page').style.display = "flex";
+                setTimeout(() => {
+                    document.getElementById('letter-page').style.opacity = "1";
+                    startSakura();
+                }, 100);
+            } else {
+                // Wrong Code - Shake effect
+                dotsBox.classList.add('shake');
+                setTimeout(() => {
+                    dotsBox.classList.remove('shake');
+                    inputCode = "";
+                    updateDots();
+                }, 400);
+            }
+        }
+
+        // --- SAKURA LOGIC ---
+        function startSakura() {
+            const container = document.getElementById('sakura');
+            for (let i = 0; i < 25; i++) {
+                const petal = document.createElement('div');
+                petal.classList.add('petal');
+                const size = Math.random() * 8 + 8 + 'px'; 
+                petal.style.width = size;
+                petal.style.height = size;
+                petal.style.left = Math.random() * 100 + 'vw';
+                petal.style.animationDuration = Math.random() * 4 + 4 + 's';
+                petal.style.animationDelay = Math.random() * 1 + 's';
+                container.appendChild(petal);
+            }
+        }
+    </script>
+</body>
+</html>
